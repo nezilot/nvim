@@ -9,10 +9,17 @@ vim.fn['plug#']('nvim-tree/nvim-web-devicons')
 vim.fn['plug#']('romgrk/barbar.nvim')
 vim.fn['plug#']('nvim-lualine/lualine.nvim')
 vim.fn['plug#']('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
+
 -- Для coc.nvim указываем так:
 vim.fn['plug#']('neoclide/coc.nvim', { ['branch'] = 'release' })
 vim.fn['plug#']('f-person/git-blame.nvim')
 vim.fn['plug#']('numToStr/Comment.nvim')
+
+-- Telescope
+vim.fn['plug#']('nvim-lua/plenary.nvim')
+vim.fn['plug#']('nvim-telescope/telescope.nvim', { ['tag'] = '0.1.4' })
+vim.fn['plug#']('ibhagwan/fzf-lua', { ['branch'] = 'main' })
+
 
 vim.call('plug#end')
 
@@ -26,5 +33,6 @@ require"barbar"
 require"lua_line"
 require"treesitter"
 require"coclsp"
-require('comment-config')
-require('shortcut')
+require'comment-config'
+require'shortcut'
+require"telescope_config"
