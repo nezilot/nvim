@@ -1,5 +1,15 @@
 -- https://raw.githubusercontent.com/neoclide/coc.nvim/master/doc/coc-example-config.lua
 
+-- autoformat 
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = { "*.js", "*.css","*.ts", "*.lua", "*.py", "*.rs", "*.go", "*.json", "*.html" },
+  callback = function()
+    vim.fn.CocAction("format")
+  end,
+})
+
+
 -- Some servers have issues with backup files, see #649
 vim.opt.backup = false
 vim.opt.writebackup = false
