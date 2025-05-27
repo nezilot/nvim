@@ -22,8 +22,3 @@ vim.keymap.set('i', '<C-j>', '<Esc>:move .+1<CR>==gi', { desc = 'Move line down'
 -- На строчку выше
 vim.keymap.set('i', '<C-k>', '<Esc>:move .-2<CR>==gi', { desc = 'Move line up' })
 
--- Свернуть блок кода 
-vim.keymap.set('n', '<C-[>', 'zc', { desc = 'Fold current block' })
-
--- Развернуть блок кода 
-vim.keymap.set('n', '<C-]>', 'zo', { desc = 'Unfold current block' })
