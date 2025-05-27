@@ -22,7 +22,7 @@ vim.fn['plug#']('ibhagwan/fzf-lua', { ['branch'] = 'main' })
 vim.call('plug#end')
 
 home=os.getenv("HOME")
-package.path = home .. "/.config/nvim/?.lua;" .. package.path
+package.path = home .. "/.config/nvim/config/?.lua;" .. package.path
 
 require"vimtree"
 require"theme"
