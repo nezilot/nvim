@@ -67,8 +67,3 @@ vim.opt.clipboard = 'unnamedplus'  -- Использовать системны�
 vim.keymap.set({'n', 'v'}, 'y', '"+y', {desc = 'Копировать в системный буфер'})
 vim.keymap.set({'n', 'v'}, 'p', '"+p', {desc = 'Вставить из системного буфера'})
 vim.keymap.set({'n', 'v'}, 'P', '"+P', {desc = 'Вставить до курсора из буфера'})
-
-lkfjadsfklj
-
-
-lfsdajfkljdsaksldjf
