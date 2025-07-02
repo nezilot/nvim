@@ -73,6 +73,37 @@ require("nvim-tree").setup({
   },
 })
 
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'NvimTree',
+  callback = function()
+    -- Делаем курсор полностью прозрачным
+    vim.opt_local.guicursor = "a:ver1-Cursor/lCursor-blinkon0"
+    
+    -- Альтернативный вариант (для некоторых терминалов)
+    vim.cmd([[highlight Cursor guifg=bg guibg=bg]])
+    
+    -- Улучшаем подсветку строки
+    vim.cmd([[
+      highlight NvimTreeCursorLine guibg=#3a3a3a gui=none
+    ]])
+    
+    -- Дополнительные настройки для лучшего вида
+    vim.opt_local.signcolumn = "no"
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+  end
+})
+
+-- Восстанавливаем курсор при выходе из NvimTree
+vim.api.nvim_create_autocmd('BufLeave', {
+  pattern = 'NvimTree_*',
+  callback = function()
+    vim.opt.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
+    vim.cmd([[highlight Cursor guifg=NONE guibg=NONE]])
+  end
+})
+
 -- Умное переключение NvimTree с отслеживанием состояния
 vim.keymap.set('n', '<C-\\>', function()
   local api = require('nvim-tree.api')
