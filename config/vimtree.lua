@@ -104,17 +104,36 @@ vim.api.nvim_create_autocmd('BufLeave', {
   end
 })
 
--- Умное переключение NvimTree с отслеживанием состояния
+-- Умное переключение NvimTree с правильным поведением фокуса
 vim.keymap.set('n', '<C-\\>', function()
   local api = require('nvim-tree.api')
-  nvim_tree_visible = not api.tree.is_visible()
+  local current_win = vim.api.nvim_get_current_win()
   
-  if nvim_tree_visible then
-    api.tree.open()
-    -- Небольшая задержка для стабильности
-    vim.defer_fn(update_nvim_tree_highlight, 50)
+  -- Проверяем, открыто ли дерево в каком-либо окне
+  local tree_win
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.bo[buf].filetype == 'NvimTree' then
+      tree_win = win
+      break
+    end
+  end
+
+  if tree_win then
+    -- Если дерево открыто в текущем окне - закрываем
+    if tree_win == current_win then
+      api.tree.close()
+      nvim_tree_visible = false
+    else
+      -- Если открыто в другом окне - переключаем фокус
+      vim.api.nvim_set_current_win(tree_win)
+      nvim_tree_visible = true
+    end
   else
-    api.tree.close()
+    -- Если дерево не открыто - открываем
+    api.tree.open()
+    nvim_tree_visible = true
+    vim.defer_fn(update_nvim_tree_highlight, 50)
   end
 end, { noremap = true, silent = true, desc = "Toggle NvimTree" })
 
