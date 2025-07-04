@@ -1,180 +1,156 @@
--- Отключаем netrw
+-- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- Включаем 24-битные цвета (для корректного отображения темы)
+-- optionally enable 24-bit colour
 vim.opt.termguicolors = true
 
--- Локальная переменная для отслеживания состояния NvimTree
-local nvim_tree_visible = false
+-- setup with options
 
--- Оптимизированная функция обновления подсветки (работает только когда дерево видимо)
-local function update_nvim_tree_highlight()
-  if not nvim_tree_visible then return end
-  
-  local ok, api = pcall(require, 'nvim-tree.api')
-  if ok and api.tree.is_visible() then
-    api.tree.find_file(vim.api.nvim_buf_get_name(0), false)
-  end
-end
-
--- Настройка NvimTree (оптимизированная версия)
 require("nvim-tree").setup({
-  view = {
-    width = 30,
-    cursorline = true,
-    -- Отключаем ненужные функции
-    relativenumber = false,
-    number = false,
-    preserve_window_proportions = false,
-  },
-  renderer = {
-    highlight_opened_files = "icon",
-    indent_markers = {
-      enable = true,
-    },
-    icons = {
-      webdev_colors = false, -- Используем цвета темы
-      show = {
-        git = true,
-        file = true,
-        folder = true,
-        folder_arrow = false, -- Убираем стрелки для минимализма
-      },
-    },
-    -- Оптимизации рендеринга
-    add_trailing = false,
-    highlight_git = false,
-    highlight_modified = "none",
-    root_folder_modifier = ":~",
-  },
-  -- Отключаем ненужные функции
-  filters = {
-    dotfiles = false,
-    custom = {},
-    exclude = {},
-  },
-  actions = {
-    change_dir = {
-      enable = false, -- Убираем автоматическое изменение директории
-    },
-    open_file = {
-      quit_on_open = false,
-      window_picker = {
-        enable = false, -- Убираем выбор окна (для производительности)
-      },
-    },
-  },
-  -- Минималистичная настройка обновлений
-  update_focused_file = {
-    enable = true,
-    update_root = false,
-    update_cwd = false,
-  },
+	sort = {
+		sorter = "case_sensitive",
+	},
+	view = {
+		width = 30,
+	},
+	renderer = {
+		group_empty = true,
+		highlight_opened_files = "name", -- 🔥 это подсветка текущего файла
+	},
+	update_focused_file = {
+		enable = true, -- 🔥 это фокусировка на текущем буфере
+		update_root = false,
+		ignore_list = {},
+	},
+	filters = {
+		dotfiles = false,
+	},
+	actions = {
+		open_file = {
+			quit_on_open = false,
+		},
+		change_dir = {
+			enable = true,
+			global = false,
+		},
+	},
 })
 
-
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'NvimTree',
-  callback = function()
-    -- Делаем курсор полностью прозрачным
-    vim.opt_local.guicursor = "a:ver1-Cursor/lCursor-blinkon0"
-    
-    -- Альтернативный вариант (для некоторых терминалов)
-    vim.cmd([[highlight Cursor guifg=bg guibg=bg]])
-    
-    -- Улучшаем подсветку строки
-    vim.cmd([[
-      highlight NvimTreeCursorLine guibg=#3a3a3a gui=none
-    ]])
-    
-    -- Дополнительные настройки для лучшего вида
-    vim.opt_local.signcolumn = "no"
-    vim.opt_local.number = false
-    vim.opt_local.relativenumber = false
-  end
-})
-
--- Восстанавливаем курсор при выходе из NvimTree
-vim.api.nvim_create_autocmd('BufLeave', {
-  pattern = 'NvimTree_*',
-  callback = function()
-    vim.opt.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
-    vim.cmd([[highlight Cursor guifg=NONE guibg=NONE]])
-  end
-})
-
--- Умное переключение NvimTree с правильным поведением фокуса
+-- Smart toggle/focus/close NvimTree with Ctrl+\
 vim.keymap.set('n', '<C-\\>', function()
-  local api = require('nvim-tree.api')
-  local current_win = vim.api.nvim_get_current_win()
-  
-  -- Проверяем, открыто ли дерево в каком-либо окне
-  local tree_win
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    if vim.bo[buf].filetype == 'NvimTree' then
-      tree_win = win
-      break
-    end
-  end
+	local nvim_tree = require('nvim-tree.api')
+	local is_open = nvim_tree.tree.is_visible()
 
-  if tree_win then
-    -- Если дерево открыто в текущем окне - закрываем
-    if tree_win == current_win then
-      api.tree.close()
-      nvim_tree_visible = false
-    else
-      -- Если открыто в другом окне - переключаем фокус
-      vim.api.nvim_set_current_win(tree_win)
-      nvim_tree_visible = true
-    end
-  else
-    -- Если дерево не открыто - открываем
-    api.tree.open()
-    nvim_tree_visible = true
-    vim.defer_fn(update_nvim_tree_highlight, 50)
-  end
+	if is_open then
+		local is_focused = vim.fn.winnr() == vim.fn.bufwinnr('NvimTree_' .. vim.api.nvim_get_current_tabpage())
+		if is_focused then
+			nvim_tree.tree.close()
+		else
+			nvim_tree.tree.focus()
+		end
+	else
+		nvim_tree.tree.open()
+	end
 end, { noremap = true, silent = true, desc = "Toggle NvimTree" })
 
--- Автоматическое обновление только при видимом дереве
-local nvim_tree_group = vim.api.nvim_create_augroup("NvimTree", { clear = true })
-vim.api.nvim_create_autocmd({'BufEnter', 'WinEnter'}, {
-  group = nvim_tree_group,
-  callback = function()
-    if nvim_tree_visible then
-      update_nvim_tree_highlight()
-    end
-  end
-})
-
--- Настройки только для буфера NvimTree (загружаются при открытии)
 vim.api.nvim_create_autocmd('FileType', {
-  group = nvim_tree_group,
-  pattern = 'NvimTree',
-  callback = function()
-    local api = require('nvim-tree.api')
-    local function opts(desc)
-      return { buffer = true, noremap = true, silent = true, nowait = true, desc = desc }
-    end
+	pattern = 'NvimTree',
+	callback = function()
+		local api = require('nvim-tree.api')
+		local function opts(desc)
+			return { buffer = true, noremap = true, silent = true, nowait = true, desc = desc }
+		end
 
-    -- Минималистичное меню действий
-    vim.keymap.set('n', 'n', function()
-      vim.ui.select(
-        { "Создать", "Удалить", "Переименовать", "Копировать" },
-        { prompt = "Действия:" },
-        function(choice)
-          if choice == "Создать" then api.fs.create() end
-          if choice == "Удалить" then api.fs.remove() end
-          if choice == "Переименовать" then api.fs.rename() end
-          if choice == "Копировать" then api.fs.copy.node() end
-        end
-      )
-    end, opts("Меню действий"))
+		-- Main menu on 'n'
+		vim.keymap.set('n', 'n', function()
+	local api = require('nvim-tree.api')
+	local node = api.tree.get_node_under_cursor()
+	
+	if not node then
+		vim.notify("Not in nvim-tree", vim.log.levels.WARN)
+		return
+	end
 
-    -- Быстрые действия (только основные)
-    vim.keymap.set('n', 'a', api.fs.create, opts("Создать файл"))
-    vim.keymap.set('n', 'd', api.fs.remove, opts("Удалить"))
-    vim.keymap.set('n', 'r', api.fs.rename, opts("Переименовать"))
-  end
+	vim.ui.select(
+		{
+			"Создать файл",
+			"Создать папку",
+			"Удалить",
+			"Переименовать",
+			"Копировать",
+			"Вырезать",
+			"Вставить"
+		},
+		{ 
+			prompt = "Действия с файлом:",
+			format_item = function(item)
+				return " " .. item
+			end
+		},
+		function(choice)
+			if not choice then return end
+
+			if choice == "Создать файл" then
+				vim.ui.input({ prompt = "Имя файла: " }, function(filename)
+					if filename then
+						local node = api.tree.get_node_under_cursor()
+						local path = node.absolute_path or node.link_to or vim.fn.getcwd()
+						local full_path = path .. "/" .. filename
+						
+						local ok, err = pcall(function()
+							local file = io.open(full_path, "w")
+							if file then file:close() end
+						end)
+						
+						if ok then
+							api.tree.reload()
+							vim.notify("Файл создан: " .. full_path, vim.log.levels.INFO)
+						else
+							vim.notify("Ошибка создания файла: " .. err, vim.log.levels.ERROR)
+						end
+					end
+				end)
+			elseif choice == "Создать папку" then
+				vim.ui.input({ prompt = "Имя папки: " }, function(folder_name)
+					if folder_name then
+						local node = api.tree.get_node_under_cursor()
+						local path = node.absolute_path or node.link_to or vim.fn.getcwd()
+						local full_path = path .. "/" .. folder_name
+						
+						local ok, err = pcall(vim.fn.mkdir, full_path, "p")
+						if ok then
+							api.tree.reload()
+							vim.notify("Папка создана: " .. full_path, vim.log.levels.INFO)
+						else
+							vim.notify("Ошибка создания папки: " .. err, vim.log.levels.ERROR)
+						end
+					end
+				end)
+			elseif choice == "Удалить" then
+				api.fs.remove()
+			elseif choice == "Переименовать" then
+				api.fs.rename()
+			elseif choice == "Копировать" then
+				api.fs.copy.node()
+			elseif choice == "Вырезать" then
+				api.fs.cut()
+			elseif choice == "Вставить" then
+				api.fs.paste()
+			end
+		end
+	)
+end, { desc = "Меню действий с файлом" })
+
+		-- Quick actions
+		vim.keymap.set('n', 'a', api.fs.create, opts("Создать файл"))
+		vim.keymap.set('n', 'A', function() 
+			api.fs.create({ type = "directory" })
+		end, opts("Создать папку"))
+		vim.keymap.set('n', 'd', api.fs.remove, opts("Удалить"))
+		vim.keymap.set('n', 'r', api.fs.rename, opts("Переименовать"))
+		vim.keymap.set('n', 'y', api.fs.copy.node, opts("Копировать"))
+		vim.keymap.set('n', 'x', api.fs.cut, opts("Вырезать"))
+		vim.keymap.set('n', 'p', api.fs.paste, opts("Вставить"))
+	end
 })
