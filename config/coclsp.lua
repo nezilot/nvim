@@ -3,7 +3,7 @@
 -- autoformat 
 
 vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = { "*.js", "*.ts","*.css", "*.go", "*.json", "*.html" },
+  pattern = { "*.js", "*.ts","*.css", "*.go", "*.json", "*.html", "*.c", "*.h" },
   callback = function()
     vim.fn.CocAction("format")
   end,

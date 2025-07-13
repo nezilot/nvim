@@ -13,6 +13,10 @@ require("nvim-tree").setup({
 	view = {
 		width = 30,
 	},
+	git = {
+    enable = true,
+    ignore = false,  
+	},
 	renderer = {
 		group_empty = true,
 		highlight_opened_files = "name", -- 🔥 это подсветка текущего файла
