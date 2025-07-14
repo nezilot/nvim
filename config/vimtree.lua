@@ -7,40 +7,74 @@ vim.opt.termguicolors = true
 
 -- setup with options
 require("nvim-tree").setup({
-	sort = {
-		sorter = "case_sensitive",
-	},
-	view = {
-		width = 30,
-	},
-	git = {
-    enable = true,
-    ignore = false,  
-	},
-	renderer = {
-		group_empty = true,
-		highlight_opened_files = "name", -- 🔥 это подсветка текущего файла
-	},
-	update_focused_file = {
-		enable = true, -- 🔥 это фокусировка на текущем буфере
-		update_root = false,
-		ignore_list = {},
-	},
-	filters = {
-		dotfiles = false,
-	},
-	actions = {
-		open_file = {
-			quit_on_open = false,
-		},
-		change_dir = {
-			enable = true,
-			global = false,
-		},
-	},
-})
+    -- Сортировка файлов в NvimTree
+    sort = {
+        sorter = "case_sensitive",  -- Сортировка с учётом регистра
+    },
 
--- Smart toggle/focus/close NvimTree with Ctrl+\
+    -- Окно просмотра
+    view = {
+        side = 'left',  -- Открывать NvimTree слева
+        cursorline = true,
+        float = {
+            quit_on_focus_loss = true,  -- закрытие при потере фокуса
+            open_win_config = {
+                relative = "editor",  -- относительно редактора
+                border = "rounded",  -- закругленные края
+                width = 30,
+                height = 30,
+                row = 1,
+                col = 1,
+            }
+        },
+  },
+
+    -- Работа с Git
+    git = {
+        enable = true,  -- Включить поддержку Git
+        ignore = false,  -- Не игнорировать файлы, находящиеся под версионным контролем
+    },
+
+    -- Отображение дерева
+    renderer = {
+        group_empty = true,  -- Группировать пустые папки
+        highlight_opened_files = "name",  -- Подсветка открытого файла
+        icons = {
+            show = {
+                file = true,
+                folder = true,
+                folder_arrow = true,
+            },
+        },
+    },
+
+    -- Обновление текущего файла
+    update_focused_file = {
+        enable = true,  -- Фокус на текущем файле
+        update_root = false,  -- Не менять корень проекта при фокусировке
+        ignore_list = {},  -- Игнорируемые файлы
+    },
+
+    -- Фильтры
+    filters = {
+        dotfiles = false,  -- Показывать dot-файлы
+    },
+
+    -- Действия с файлами
+    actions = {
+        open_file = {
+            quit_on_open = false,  -- Не закрывать NvimTree при открытии файла
+        },
+        change_dir = {
+            enable = true,  -- Возможность менять директорию
+            global = false,  -- Локальная смена директории для каждого окна
+        },
+    },
+
+    -- Настройки автозапуска NvimTree при старте
+    auto_reload_on_write = true,  -- Перезагружать дерево при изменении файлов
+    disable_netrw = true,  -- Отключить netrw, чтобы использовать только NvimTree
+})-- Smart toggle/focus/close NvimTree with Ctrl+\
 vim.keymap.set('n', '<C-\\>', function()
 	local nvim_tree = require('nvim-tree.api')
 	local is_open = nvim_tree.tree.is_visible()

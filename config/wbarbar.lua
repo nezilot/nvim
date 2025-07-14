@@ -1,5 +1,5 @@
--- Плагин barbar.nvim (если используешь lazy.nvim или packer — подключай его отдельно)
--- Настройка:
+
+-- Настройка barbar.nvim
 require'barbar'.setup {
     animation = true,
     clickable = true,
@@ -16,7 +16,7 @@ require'barbar'.setup {
     semantic_letters = true,
     no_name_title = nil,
     sidebar_filetypes = {
-        NvimTree = true,
+        NvimTree = true,  -- Оставляем true, чтобы NvimTree не смещался
         undotree = {text = 'undotree'},
         ['neo-tree'] = {event = 'BufWipeout'},
         Outline = {event = 'BufWinLeave', text = 'symbols-outline'},
