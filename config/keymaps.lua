@@ -1,24 +1,18 @@
--- [ Перемещение по буферам ]
+vim.keymap.set('i', '<C-s>', '<Esc>:w<CR>', { desc = 'Save file and exit insert mode' })
 
- -- Tab для следующего буфера
+vim.keymap.set('i', '[', '<Esc>:move .+1<CR>==gi', { desc = 'Move line down' })
 
-vim.api.nvim_set_keymap('n', '<Tab>', ':bnext<CR>', { noremap = true, silent = true }) 
+vim.keymap.set('i', ']', '<Esc>:move .-2<CR>==gi', { desc = 'Move line up' })
 
--- Shift+Tab для предыдущего буфера
+vim.keymap.set('i', '<C-h>', '<Left>', { desc = 'Move left' })
+vim.keymap.set('i', '<C-j>', '<Down>', { desc = 'Move down' })
+vim.keymap.set('i', '<C-k>', '<Up>', { desc = 'Move up' })
+vim.keymap.set('i', '<C-l>', '<Right>', { desc = 'Move right' })
 
-vim.api.nvim_set_keymap('n', '<S-Tab>', ':bprevious<CR>', { noremap = true, silent = true })  
 
+vim.keymap.set('i', '<C-a>', '<Home>', { desc = 'Move to beginning of line' })
+vim.keymap.set('i', '<C-e>', '<End>', { desc = 'Move to end of line' })
 
--- [ Работа с файлами ]
-		
--- Сохранение файла
-vim.keymap.set('i', '<C-s>', '<Esc>:w<CR>a', { desc = 'Save file in insert mode' })
-
--- [ Работа со строками ]
-
--- На строчку ниже
-vim.keymap.set('i', '<C-j>', '<Esc>:move .+1<CR>==gi', { desc = 'Move line down' })
-
--- На строчку выше
-vim.keymap.set('i', '<C-k>', '<Esc>:move .-2<CR>==gi', { desc = 'Move line up' })
+vim.keymap.set('i', '<C-w>', '<C-o>w', { desc = 'Move one word left' })
+vim.keymap.set('i', '<C-d>', '<C-o>b', { desc = 'Move one word right' })
 
