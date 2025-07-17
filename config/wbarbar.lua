@@ -4,8 +4,7 @@ require'barbar'.setup {
     animation = true,
     clickable = true,
     insert_at_end = true,
-    focus_on_close = 'left',  -- можно поменять на 'previous'
-    exclude_ft = {'javascript'},
+    focus_on_close = 'left',  
     exclude_name = {'package.json'},
     highlight_inactive_file_icons = false,
     highlight_visible = true,
@@ -16,7 +15,6 @@ require'barbar'.setup {
     semantic_letters = true,
     no_name_title = nil,
     sidebar_filetypes = {
-        NvimTree = true,  -- Оставляем true, чтобы NvimTree не смещался
         undotree = {text = 'undotree'},
         ['neo-tree'] = {event = 'BufWipeout'},
         Outline = {event = 'BufWinLeave', text = 'symbols-outline'},
