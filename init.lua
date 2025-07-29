@@ -14,6 +14,9 @@ vim.fn['plug#']('neoclide/coc.nvim', { ['branch'] = 'release' })
 vim.fn['plug#']('f-person/git-blame.nvim')
 vim.fn['plug#']('numToStr/Comment.nvim')
 vim.fn['plug#']('ethanholz/nvim-lastplace')
+vim.fn['plug#']('tpope/vim-fugitive')
+
+
 -- Telescope
 vim.fn['plug#']('nvim-lua/plenary.nvim')
 vim.fn['plug#']('nvim-telescope/telescope.nvim', { ['tag'] = '0.1.4' })
@@ -27,7 +30,7 @@ package.path = home .. "/.config/nvim/config/?.lua;" .. package.path
 require"vimtree"
 require"theme"
 require"common"
-require"barbar"
+require"wbarbar"
 require"lua_line"
 require"treesitter"
 require"coclsp"
