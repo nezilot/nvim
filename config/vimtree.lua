@@ -29,6 +29,17 @@ require("nvim-tree").setup({
         },
   },
 
+diagnostics = {
+  enable = true,
+  show_on_dirs = true,
+  show_on_open_dirs = true,
+  debounce_delay = 50,
+  severity = {
+    min = vim.diagnostic.severity.ERROR,  -- только ошибки
+    max = vim.diagnostic.severity.ERROR,
+  },
+},
+
     -- Работа с Git
     git = {
         enable = true,  -- Включить поддержку Git
@@ -146,4 +157,62 @@ vim.api.nvim_create_autocmd('FileType', {
 		vim.keymap.set('n', 'x', api.fs.cut, opts("Вырезать"))
 		vim.keymap.set('n', 'p', api.fs.paste, opts("Вставить"))
 	end
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'NvimTree',
+    callback = function()
+        local api = require('nvim-tree.api')
+
+        -- Функция для выполнения команды Git
+        local function run_git_command(command, file_path)
+            local cmd = "git " .. command .. " " .. file_path
+            vim.cmd("!" .. cmd)
+        end
+
+        -- Настроим клавишу g для выбора действия
+        vim.keymap.set('n', 'g', function()
+            local node = api.tree.get_node_under_cursor()
+
+            if not node then
+                vim.notify("Not in nvim-tree", vim.log.levels.WARN)
+                return
+            end
+
+            local file_path = node.absolute_path or node.link_to
+            local is_directory = node.nodes ~= nil and #node.nodes > 0
+
+            -- Запрашиваем действие через vim.ui.input
+            vim.ui.select({ "git add", "git commit", "git push" }, {
+                prompt = "Выберите действие для Git:",
+            }, function(choice)
+                if choice == "git add" then
+                    if is_directory then
+                        -- Если это папка, добавляем все файлы в папке
+                        local files = api.fs.get_nodes_in_dir(file_path)
+                        for _, file in ipairs(files) do
+                            run_git_command("add", file.absolute_path)
+                        end
+                        vim.notify("Все файлы в папке добавлены в Git", vim.log.levels.INFO)
+                    else
+                        -- Если это файл, добавляем только его
+                        run_git_command("add", file_path)
+                        vim.notify("Файл добавлен в Git: " .. file_path, vim.log.levels.INFO)
+                    end
+                elseif choice == "git commit" then
+                    -- Открываем команду git commit
+                    vim.ui.input({ prompt = "Введите сообщение коммита: " }, function(msg)
+                        if msg then
+                            run_git_command("commit -m \"" .. msg .. "\"", "")
+                            vim.notify("Коммит выполнен", vim.log.levels.INFO)
+                        end
+                    end)
+                elseif choice == "git push" then
+                    -- Выполняем git push
+                    run_git_command("push", "")
+                    vim.notify("Изменения отправлены на сервер", vim.log.levels.INFO)
+                end
+            end)
+        end, { noremap = true, silent = true, desc = "Git actions in NvimTree" })
+    end
 })
