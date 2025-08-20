@@ -48,7 +48,7 @@ diagnostics = {
 
     -- Отображение дерева
     renderer = {
-        group_empty = true,  -- Группировать пустые папки
+        group_empty = false,  -- Группировать пустые папки
         highlight_opened_files = "name",  -- Подсветка открытого файла
         icons = {
             show = {

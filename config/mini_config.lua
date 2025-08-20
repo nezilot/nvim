@@ -1,3 +1,4 @@
+
 require('mini.pairs').setup({
   modes = { insert = true, command = false, delete = false },
   mappings = {
@@ -19,3 +20,4 @@ require('mini.pairs').setup({
     disable_in_insert = false,
   }
 })
+
