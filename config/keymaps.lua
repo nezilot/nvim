@@ -1,3 +1,5 @@
+vim.keymap.set('n', 'q', '<Cmd>bd<CR>', { desc = 'close current buffer' })
+
 vim.keymap.set('i', '<C-s>', '<Esc>:w<CR>', { desc = 'Save file and exit insert mode' })
 
 vim.keymap.set('i', '[', '<Esc>:move .+1<CR>==gi', { desc = 'Move line down' })
@@ -11,8 +13,10 @@ vim.keymap.set('i', '<C-l>', '<Right>', { desc = 'Move right' })
 
 
 vim.keymap.set('i', '<C-a>', '<Home>', { desc = 'Move to beginning of line' })
-vim.keymap.set('i', '<C-e>', '<End>', { desc = 'Move to end of line' })
+ vim.keymap.set('i', '<C-e>', '<End>', { desc = 'Move to end of line' })
 
-vim.keymap.set('i', '<C-w>', '<C-o>w', { desc = 'Move one word left' })
-vim.keymap.set('i', '<C-d>', '<C-o>b', { desc = 'Move one word right' })
+
+vim.keymap.set('i', '<C-f>', '<C-o>b', { desc = 'Move one word left' })
+vim.keymap.set('i', '<C-d>', '<C-o>w', { desc = 'Move one word right' })
+
 
