@@ -15,7 +15,11 @@ vim.fn['plug#']('f-person/git-blame.nvim')
 vim.fn['plug#']('numToStr/Comment.nvim')
 vim.fn['plug#']('ethanholz/nvim-lastplace')
 vim.fn['plug#']('tpope/vim-fugitive')
+vim.fn['plug#']('norcalli/nvim-colorizer.lua')
 
+-- theme 
+
+vim.fn['plug#']('yorumicolors/yorumi.nvim')
 
 -- Telescope
 vim.fn['plug#']('nvim-lua/plenary.nvim')
@@ -40,3 +44,5 @@ require"telescope_config"
 require"mini_config"
 require"lastplace"
 require"options"
+require"snippets"
+require"colorize"
