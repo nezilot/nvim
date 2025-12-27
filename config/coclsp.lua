@@ -1,38 +1,3 @@
--- vim.api.nvim_create_autocmd("BufWritePre", {
--- 	pattern = { "*.js", "*.jsx", "*.ts", "*.tsx", "*.css", "*.go", "*.json", "*.html", "*.c", "*.h", "*.lua" },
--- 	callback = function()
--- 		vim.defer_fn(function()
--- 			-- Проверяем, что буфер все еще существует и доступен
--- 			local buf = vim.api.nvim_get_current_buf()
--- 			if not vim.api.nvim_buf_is_valid(buf) then
--- 				return
--- 			end
---
--- 			-- Проверяем, что это нормальный буфер (не nofile, теперьrap и т.д.)
--- 			local buftype = vim.api.nvim_buf_get_option(buf, 'buftype')
--- 			if buftype ~= '' then
--- 				return
--- 			end
---
--- 			-- Проверяем, что файл все еще существует на диске
--- 			local filename = vim.api.nvim_buf_get_name(buf)
--- 			if filename == '' or vim.fn.filereadable(filename) == 0 then
--- 				return
--- 			end
---
--- 			-- Проверяем, что coc доступен и буфер прикреплен
--- 			if vim.g.coc_service_initialized ~= 1 then
--- 				return
--- 			end
---
--- 			-- Безопасно вызываем форматирование
--- 			pcall(function()
--- 				vim.fn.CocAction("format")
--- 			end)
--- 		end, 100)
--- 	end,
--- })
-
 vim.opt.backup = false
 vim.opt.writebackup = false
 

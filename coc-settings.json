@@ -1,0 +1,29 @@
+{
+  "tsserver.enable": true,
+  "eslint.packageManager": "npm",
+  "diagnostic.enable": true,
+
+  //   "coc.preferences.formatOnSave": false,
+  // "coc.preferences.formatOnSaveFiletypes": [
+  //  "javascript",
+  // "typescript",
+  // "javascriptreact",
+  // "typescriptreact",
+  // "c",
+  // "cpp",
+  // "objc",
+  // "objcpp",
+  // "html"
+  // ],
+  "diagnostic.checkCurrentLine": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ]
+}
