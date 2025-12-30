@@ -1,25 +1,42 @@
-local keymap = vim.keymap.set
+require('telescope').setup {
+	defaults = {
+		prompt_prefix = "🔍 ",
+		selection_caret = ":D ",
 
-keymap("n", "<leader>f", function()
-	require("fzf-lua").files({
-		actions = {
-			["default"] = function(selected, opts)
-				require("fzf-lua.actions").file_edit(selected, opts)
+		file_ignore_patterns = {
+			"node_modules",
+			".git",
+			".next",
+			".cache",
+			"pnpm-lock.yaml",
+		},
 
-				vim.cmd("silent! execute '%bdelete | edit # | normal! \"_dd'")
-			end,
+		vimgrep_arguments = {
+			"rg",
+			"--color=never",
+			"--no-heading",
+			"--with-filename",
+			"--line-number",
+			"--column",
+			"--smart-case",
+			"--hidden",
+		},
+
+		mappings = {
+			i = {
+				["<C-h>"] = "which_key",
+				["<C-j>"] = "move_selection_next",
+				["<C-k>"] = "move_selection_previous",
+			}
 		}
-	})
-end, { desc = "Fzf files" })
+	},
+	pickers = {
+			},
+	extensions = {}
+}
 
-keymap("n", "<leader>g", function()
-	require("fzf-lua").live_grep({
-		actions = {
-			["default"] = function(selected, opts)
-				require("fzf-lua.actions").file_edit(selected, opts)
 
-				vim.cmd("silent! execute '%bdelete | edit # | normal! \"_dd'")
-			end,
-		}
-	})
-end, { desc = "Fzf live grep" })
+vim.keymap.set('n', '\\f', require('telescope.builtin').find_files, { desc = "Find files" })
+
+vim.keymap.set('n', '\\h', require('telescope.builtin').help_tags, { desc = "Help tags" })
+vim.keymap.set('n', '\\r', require('telescope.builtin').oldfiles, { desc = "Recent files" })
