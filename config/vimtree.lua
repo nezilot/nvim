@@ -1,26 +1,95 @@
--- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- optionally enable 24-bit colour
 vim.opt.termguicolors = true
 
--- setup with options
+local function safe_del(mode, lhs, opts)
+	pcall(vim.keymap.del, mode, lhs, opts)
+end
+
+local function async_remove()
+	local api = require("nvim-tree.api")
+	local node = api.tree.get_node_under_cursor()
+	if not node then return end
+
+	local path = node.absolute_path or node.link_to
+	local escaped_path = vim.fn.shellescape(path)
+	local is_folder = node.type == "directory"
+
+	vim.ui.input({
+		prompt = (is_folder and "Удалить папку? y/n: " or "Удалить файл? y/n: "),
+	}, function(input)
+		if not input or not input:lower():match("^y") then return end
+
+		local cmd = is_folder
+			and ("rm -rf " .. escaped_path)
+			or ("rm " .. escaped_path)
+
+		vim.fn.jobstart(cmd, {
+			on_exit = function(_, code)
+				vim.schedule(function()
+					if code == 0 then
+						api.tree.reload()
+						vim.notify("Удалено", vim.log.levels.INFO)
+					else
+						vim.notify("Ошибка удаления", vim.log.levels.ERROR)
+					end
+				end)
+			end,
+		})
+	end)
+end
+
+
+local function attach(bufnr)
+	local api = require("nvim-tree.api")
+
+	-- 🔥 ПЕРЕОПРЕДЕЛЯЕМ ТОЛЬКО delete
+	safe_del("n", "d", { buffer = bufnr })
+	vim.keymap.set("n", "d", async_remove, {
+		buffer = bufnr,
+		desc = "Async delete",
+	})
+
+	vim.keymap.set("n", "<C-k>", api.node.show_info_popup, {
+		buffer = bufnr,
+		desc = "File info",
+	})
+
+	-- 📁 Enter — открыть файл / раскрыть папку
+	vim.keymap.set("n", "<CR>", api.node.open.edit, {
+		buffer = bufnr,
+		desc = "Open",
+	})
+
+	-- ✏️ r — rename
+	vim.keymap.set("n", "r", api.fs.rename, {
+		buffer = bufnr,
+		desc = "Rename",
+	})
+
+	-- ➕ n — создать файл/папку
+	vim.keymap.set("n", "n", api.fs.create, {
+		buffer = bufnr,
+		desc = "Create",
+	})
+end
+
+
 require("nvim-tree").setup({
-	-- Сортировка файлов в NvimTree
+	on_attach = attach,
 	sort = {
-		sorter = "case_sensitive", -- Сортировка с учётом регистра
+		sorter = "case_sensitive",
 	},
 
-	-- Окно просмотра
 	view = {
-		side = 'left', -- Открывать NvimTree слева
+		side = 'left',
 		cursorline = true,
 		float = {
-			quit_on_focus_loss = true, -- закрытие при потере фокуса
+			quit_on_focus_loss = true,
 			open_win_config = {
-				relative = "editor", -- относительно редактора
-				border = "rounded", -- закругленные края
+				relative = "editor",
+				border = "rounded",
 				width = 30,
 				height = 30,
 				row = 1,
@@ -35,21 +104,19 @@ require("nvim-tree").setup({
 		show_on_open_dirs = true,
 		debounce_delay = 50,
 		severity = {
-			min = vim.diagnostic.severity.ERROR, -- только ошибки
+			min = vim.diagnostic.severity.ERROR,
 			max = vim.diagnostic.severity.ERROR,
 		},
 	},
 
-	-- Работа с Git
 	git = {
-		enable = true, -- Включить поддержку Git
-		ignore = false, -- Не игнорировать файлы, находящиеся под версионным контролем
+		enable = true,
+		ignore = false,
 	},
 
-	-- Отображение дерева
 	renderer = {
-		group_empty = false,       -- Группировать пустые папки
-		highlight_opened_files = "name", -- Подсветка открытого файла
+		group_empty = false,
+		highlight_opened_files = "name",
 		icons = {
 			show = {
 				file = true,
@@ -59,33 +126,32 @@ require("nvim-tree").setup({
 		},
 	},
 
-	-- Обновление текущего файла
 	update_focused_file = {
-		enable = true, -- Фокус на текущем файле
-		update_root = false, -- Не менять корень проекта при фокусировке
-		ignore_list = {}, -- Игнорируемые файлы
+		enable = true,
+		update_root = false,
+		ignore_list = {},
 	},
 
-	-- Фильтры
 	filters = {
-		dotfiles = false, -- Показывать dot-файлы
+		dotfiles = false,
 	},
 
-	-- Действия с файлами
 	actions = {
 		open_file = {
-			quit_on_open = false, -- Не закрывать NvimTree при открытии файла
+			quit_on_open = false,
 		},
 		change_dir = {
-			enable = true, -- Возможность менять директорию
-			global = false, -- Локальная смена директории для каждого окна
+			enable = true,
+			global = false,
 		},
 	},
 
-	-- Настройки автозапуска NvimTree при старте
-	auto_reload_on_write = true, -- Перезагружать дерево при изменении файлов
-	disable_netrw = true,     -- Отключить netrw, чтобы использовать только NvimTree
-})                            -- Smart toggle/focus/close NvimTree with Ctrl+\
+	auto_reload_on_write = true,
+	disable_netrw = true,
+})
+
+
+
 vim.keymap.set('n', '<C-\\>', function()
 	local nvim_tree = require('nvim-tree.api')
 	local is_open = nvim_tree.tree.is_visible()
@@ -102,71 +168,68 @@ vim.keymap.set('n', '<C-\\>', function()
 	end
 end, { noremap = true, silent = true, desc = "Toggle NvimTree" })
 
-vim.api.nvim_create_autocmd('FileType', {
-	pattern = 'NvimTree',
-	callback = function()
-		local api = require('nvim-tree.api')
-		local function opts(desc)
-			return { buffer = true, noremap = true, silent = true, nowait = true, desc = desc }
-		end
-
-		-- Main menu on 'n'
-		vim.keymap.set('n', 'n', function()
-			local api = require('nvim-tree.api')
-			local node = api.tree.get_node_under_cursor()
-
-			if not node then
-				vim.notify("Not in nvim-tree", vim.log.levels.WARN)
-				return
-			end
-
-			-- Ask for the name and type of creation
-			vim.ui.input({ prompt = "Путь и имя (файл или папка): " }, function(name)
-				if name then
-					local node = api.tree.get_node_under_cursor()
-					local path = node.absolute_path or node.link_to or vim.fn.getcwd()
-					local full_path = path .. "/" .. name
-
-					-- Create file or folder based on the name
-					local ok, err
-					if name:match("%.") then
-						-- Create file if name contains a dot (i.e., file extension)
-						ok, err = pcall(function()
-							local file = io.open(full_path, "w")
-							if file then file:close() end
-						end)
-					else
-						-- Create directory if name does not contain a dot
-						ok, err = pcall(vim.fn.mkdir, full_path, "p")
-					end
-
-					if ok then
-						api.tree.reload()
-						vim.notify((name:match("%.") and "Файл" or "Папка") .. " создана: " .. full_path,
-							vim.log.levels.INFO)
-					else
-						vim.notify((name:match("%.") and "Ошибка создания файла: " or "Ошибка создания папки: ") .. err,
-							vim.log.levels.ERROR)
-					end
-				end
-			end)
-		end, { desc = "Меню создания файла/папки" })
-
-		-- Quick actions
-		vim.keymap.set('n', 'd', api.fs.remove, opts("Удалить"))
-		vim.keymap.set('n', 'r', api.fs.rename, opts("Переименовать"))
-		vim.keymap.set('n', 'y', api.fs.copy.node, opts("Копировать"))
-		vim.keymap.set('n', 'x', api.fs.cut, opts("Вырезать"))
-		vim.keymap.set('n', 'p', api.fs.paste, opts("Вставить"))
-	end
-})
+-- vim.api.nvim_create_autocmd('FileType', {
+-- 	pattern = 'NvimTree',
+-- 	callback = function()
+-- 		local api = require('nvim-tree.api')
+-- 		local function opts(desc)
+-- 			return { buffer = true, noremap = true, silent = true, nowait = true, desc = desc }
+-- 		end
+--
+-- 		vim.keymap.set('n', 'n', function()
+-- 			local api = require('nvim-tree.api')
+-- 			local node = api.tree.get_node_under_cursor()
+--
+-- 			if not node then
+-- 				vim.notify("Not in nvim-tree", vim.log.levels.WARN)
+-- 				return
+-- 			end
+--
+-- 			vim.ui.input({ prompt = "Путь и имя (файл или папка): " }, function(name)
+-- 				if name then
+-- 					local node = api.tree.get_node_under_cursor()
+-- 					local path = node.absolute_path or node.link_to or vim.fn.getcwd()
+-- 					local full_path = path .. "/" .. name
+--
+-- 					-- Create file or folder based on the name
+-- 					local ok, err
+-- 					if name:match("%.") then
+-- 						-- Create file if name contains a dot (i.e., file extension)
+-- 						ok, err = pcall(function()
+-- 							local file = io.open(full_path, "w")
+-- 							if file then file:close() end
+-- 						end)
+-- 					else
+-- 						-- Create directory if name does not contain a dot
+-- 						ok, err = pcall(vim.fn.mkdir, full_path, "p")
+-- 					end
+--
+-- 					if ok then
+-- 						api.tree.reload()
+-- 						vim.notify((name:match("%.") and "Файл" or "Папка") .. " создана: " .. full_path,
+-- 							vim.log.levels.INFO)
+-- 					else
+-- 						vim.notify((name:match("%.") and "Ошибка создания файла: " or "Ошибка создания папки: ") .. err,
+-- 							vim.log.levels.ERROR)
+-- 					end
+-- 				end
+-- 			end)
+-- 		end, { desc = "Меню создания файла/папки" })
+--
+-- 		-- Quick actions
+-- 		vim.keymap.set('n', 'p', api.fs.remove, opts("Удалить "))
+-- 		vim.keymap.set('n', 'r', api.fs.rename, opts("Переименовать"))
+-- 		vim.keymap.set('n', 'y', api.fs.copy.node, opts("Копировать"))
+-- 		vim.keymap.set('n', 'x', api.fs.cut, opts("Вырезать"))
+-- 		vim.keymap.set('n', 'p', api.fs.paste, opts("Вставить"))
+-- 	end
+-- })
 
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = 'NvimTree',
 	callback = function()
 		local api = require('nvim-tree.api')
 
-		-- Быстрые команды Git
 		vim.api.nvim_buf_create_user_command(0, 'GitAdd', function()
 			local node = api.tree.get_node_under_cursor()
 			if node then
@@ -194,7 +257,6 @@ vim.api.nvim_create_autocmd('FileType', {
 			})
 		end, { desc = 'Push changes' })
 
-		-- Быстрые маппинги
 		vim.keymap.set('n', 'ga', ':GitAdd<CR>', { buffer = true, desc = 'Git add' })
 		vim.keymap.set('n', 'gc', ':GitCommit ', { buffer = true, desc = 'Git commit' })
 		vim.keymap.set('n', 'gp', ':GitPush<CR>', { buffer = true, desc = 'Git push' })
