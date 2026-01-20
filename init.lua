@@ -16,6 +16,7 @@ vim.fn['plug#']('numToStr/Comment.nvim')
 vim.fn['plug#']('ethanholz/nvim-lastplace')
 vim.fn['plug#']('tpope/vim-fugitive')
 vim.fn['plug#']('norcalli/nvim-colorizer.lua')
+vim.fn['plug#']('joshdick/onedark.vim')
 
 -- debug
 vim.fn['plug#']('mfussenegger/nvim-dap')

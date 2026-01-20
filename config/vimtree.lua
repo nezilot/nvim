@@ -44,7 +44,6 @@ end
 local function attach(bufnr)
 	local api = require("nvim-tree.api")
 
-	-- 🔥 ПЕРЕОПРЕДЕЛЯЕМ ТОЛЬКО delete
 	safe_del("n", "d", { buffer = bufnr })
 	vim.keymap.set("n", "d", async_remove, {
 		buffer = bufnr,
@@ -72,6 +71,21 @@ local function attach(bufnr)
 	vim.keymap.set("n", "n", api.fs.create, {
 		buffer = bufnr,
 		desc = "Create",
+	})
+
+
+	vim.keymap.set("n", "c", api.fs.copy.node, {
+		buffer = bufnr,
+		desc = "Copy",
+	})
+
+
+	vim.keymap.set("n", "p", function()
+		require("nvim-tree.api").fs.paste() -- функция сама по себе
+		require("nvim-tree.api").tree.reload() -- обновляем дерево
+	end, {
+		buffer = bufnr,
+		desc = "Paste",
 	})
 end
 
@@ -167,63 +181,6 @@ vim.keymap.set('n', '<C-\\>', function()
 		nvim_tree.tree.open()
 	end
 end, { noremap = true, silent = true, desc = "Toggle NvimTree" })
-
--- vim.api.nvim_create_autocmd('FileType', {
--- 	pattern = 'NvimTree',
--- 	callback = function()
--- 		local api = require('nvim-tree.api')
--- 		local function opts(desc)
--- 			return { buffer = true, noremap = true, silent = true, nowait = true, desc = desc }
--- 		end
---
--- 		vim.keymap.set('n', 'n', function()
--- 			local api = require('nvim-tree.api')
--- 			local node = api.tree.get_node_under_cursor()
---
--- 			if not node then
--- 				vim.notify("Not in nvim-tree", vim.log.levels.WARN)
--- 				return
--- 			end
---
--- 			vim.ui.input({ prompt = "Путь и имя (файл или папка): " }, function(name)
--- 				if name then
--- 					local node = api.tree.get_node_under_cursor()
--- 					local path = node.absolute_path or node.link_to or vim.fn.getcwd()
--- 					local full_path = path .. "/" .. name
---
--- 					-- Create file or folder based on the name
--- 					local ok, err
--- 					if name:match("%.") then
--- 						-- Create file if name contains a dot (i.e., file extension)
--- 						ok, err = pcall(function()
--- 							local file = io.open(full_path, "w")
--- 							if file then file:close() end
--- 						end)
--- 					else
--- 						-- Create directory if name does not contain a dot
--- 						ok, err = pcall(vim.fn.mkdir, full_path, "p")
--- 					end
---
--- 					if ok then
--- 						api.tree.reload()
--- 						vim.notify((name:match("%.") and "Файл" or "Папка") .. " создана: " .. full_path,
--- 							vim.log.levels.INFO)
--- 					else
--- 						vim.notify((name:match("%.") and "Ошибка создания файла: " or "Ошибка создания папки: ") .. err,
--- 							vim.log.levels.ERROR)
--- 					end
--- 				end
--- 			end)
--- 		end, { desc = "Меню создания файла/папки" })
---
--- 		-- Quick actions
--- 		vim.keymap.set('n', 'p', api.fs.remove, opts("Удалить "))
--- 		vim.keymap.set('n', 'r', api.fs.rename, opts("Переименовать"))
--- 		vim.keymap.set('n', 'y', api.fs.copy.node, opts("Копировать"))
--- 		vim.keymap.set('n', 'x', api.fs.cut, opts("Вырезать"))
--- 		vim.keymap.set('n', 'p', api.fs.paste, opts("Вставить"))
--- 	end
--- })
 
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = 'NvimTree',
