@@ -55,19 +55,16 @@ local function attach(bufnr)
 		desc = "File info",
 	})
 
-	-- 📁 Enter — открыть файл / раскрыть папку
 	vim.keymap.set("n", "<CR>", api.node.open.edit, {
 		buffer = bufnr,
 		desc = "Open",
 	})
 
-	-- ✏️ r — rename
 	vim.keymap.set("n", "r", api.fs.rename, {
 		buffer = bufnr,
 		desc = "Rename",
 	})
 
-	-- ➕ n — создать файл/папку
 	vim.keymap.set("n", "n", api.fs.create, {
 		buffer = bufnr,
 		desc = "Create",
