@@ -43,3 +43,5 @@ vim.keymap.set('i', '<C-d>', '<C-o>w', { desc = 'move one word right' })
 
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.api.nvim_set_keymap('n', 't', ':terminal<CR>', { noremap = true, silent = true, desc = 'Open terminal in split' })
+
+vim.opt.langmap = 'ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz'
