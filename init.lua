@@ -17,6 +17,7 @@ vim.fn['plug#']('ethanholz/nvim-lastplace')
 vim.fn['plug#']('tpope/vim-fugitive')
 vim.fn['plug#']('norcalli/nvim-colorizer.lua')
 vim.fn['plug#']('joshdick/onedark.vim')
+vim.fn['plug#']('MeanderingProgrammer/render-markdown.nvim')
 
 -- debug
 vim.fn['plug#']('mfussenegger/nvim-dap')
@@ -47,6 +48,8 @@ vim.fn['plug#']('stevearc/aerial.nvim')
 
 vim.call('plug#end')
 
+require('render-markdown').setup({})
+
 home = os.getenv("HOME")
 package.path = home .. "/.config/nvim/config/?.lua;" .. package.path
 
@@ -68,3 +71,4 @@ require "colorize"
 require "uptimaze"
 require "masonn"
 require "dapp"
+

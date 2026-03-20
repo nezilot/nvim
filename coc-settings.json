@@ -3,7 +3,7 @@
   "eslint.packageManager": "npm",
   "diagnostic.enable": true,
 
- "languageserver": {
+  "languageserver": {
     "rust": {
       "command": "rust-analyzer",
       "filetypes": ["rust"],
@@ -22,7 +22,8 @@
     }
   },
 
-  //   "coc.preferences.formatOnSave": false,
+  "coc.preferences.formatOnSave": false,
+  "coc.preferences.willSaveHandlerTimeout": 500,
   // "coc.preferences.formatOnSaveFiletypes": [
   //  "javascript",
   // "typescript",
@@ -35,9 +36,9 @@
   // "html"
   // ],
   "diagnostic.checkCurrentLine": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
+  //  "editor.codeActionsOnSave": {
+  //  "source.fixAll.eslint": true
+  // },
 
   "eslint.validate": [
     "javascript",
