@@ -13,7 +13,7 @@ local saveAutoFormat = function()
 		-- 4. Опционально: если хочешь, чтобы lualine все-таки обновился,
 		-- делаем это через микро-паузу, когда nvim уже "отвис"
 		vim.schedule(function()
-			vim.cmd("checktime")  -- Синхронизирует состояние буфера
+			vim.cmd("checktime") -- Синхронизирует состояние буфера
 		end)
 	end)
 end
@@ -44,6 +44,10 @@ vim.keymap.set('i', '<C-e>', '<End>', { desc = 'move to end of line' })
 -- moving row
 vim.keymap.set('i', '<C-f>', '<C-o>b', { desc = 'move one word left' })
 vim.keymap.set('i', '<C-d>', '<C-o>w', { desc = 'move one word right' })
+
+vim.api.nvim_create_autocmd("TermOpen", {
+	command = "setlocal winfixheight"
+})
 
 -- terminal
 
