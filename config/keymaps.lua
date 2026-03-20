@@ -1,15 +1,21 @@
 local saveAutoFormat = function()
-	local success, _ = pcall(vim.fn.CocAction, 'format')
-
-	if success then
-		vim.cmd("write")
-	else
-		vim.cmd("write")
-	end
-
+	-- 1. Выходим из режима вставки
 	if vim.api.nvim_get_mode().mode == 'i' then
-		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'n', false)
+		vim.cmd('stopinsert')
 	end
+
+	-- 2. Запускаем формат асинхронно
+	vim.fn.CocActionAsync('format', function(err)
+		-- 3. Сохраняем БЕЗ вызова автокоманд (чтобы не триггерить lualine/barbar/git)
+		-- 'update' сохранит только если текст реально изменился после формата
+		vim.cmd("silent! noautocmd update")
+
+		-- 4. Опционально: если хочешь, чтобы lualine все-таки обновился,
+		-- делаем это через микро-паузу, когда nvim уже "отвис"
+		vim.schedule(function()
+			vim.cmd("checktime")  -- Синхронизирует состояние буфера
+		end)
+	end)
 end
 
 vim.keymap.set('n', 'qq', '<Cmd>bd!<CR>', { desc = 'close current buffer' })
@@ -44,4 +50,5 @@ vim.keymap.set('i', '<C-d>', '<C-o>w', { desc = 'move one word right' })
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.api.nvim_set_keymap('n', 't', ':terminal<CR>', { noremap = true, silent = true, desc = 'Open terminal in split' })
 
-vim.opt.langmap = 'ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz'
+vim.opt.langmap =
+'ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz'
