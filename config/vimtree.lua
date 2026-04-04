@@ -44,7 +44,21 @@ end
 local function attach(bufnr)
 	local api = require("nvim-tree.api")
 
+
+
 	safe_del("n", "d", { buffer = bufnr })
+
+
+	vim.keymap.set("n", "l", api.tree.change_root_to_node, {
+		buffer = bufnr,
+		desc = "CD into directory"
+	})
+
+	vim.keymap.set("n", "h", api.tree.change_root_to_parent, {
+		buffer = bufnr,
+		desc = "CD up"
+	})
+
 	vim.keymap.set("n", "d", async_remove, {
 		buffer = bufnr,
 		desc = "Async delete",

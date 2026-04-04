@@ -18,8 +18,32 @@ local saveAutoFormat = function()
 	end)
 end
 
-vim.keymap.set('n', 'qq', '<Cmd>bd!<CR>', { desc = 'close current buffer' })
+-- vim.keymap.set('n', 'qq', '<Cmd>bd!<CR>', { desc = 'close current buffer' })
 
+local smart_close = function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local buf_type = vim.bo[bufnr].buftype
+
+	if buf_type == 'terminal' then
+		-- Терминал закрываем принудительно, сплит под ним обычно должен схлопнуться
+		-- (так как терминал — это процесс)
+		vim.cmd('bdelete!')
+	else
+		-- Для обычных файлов:
+		-- 1. Пробуем переключиться на предыдущий буфер ВНУТРИ этого окна
+		-- 2. Затем удаляем (bd) предыдущий активный буфер (#)
+		local success, _ = pcall(vim.cmd, 'bp | bd #')
+
+		if not success then
+			-- Если bp не сработал (один файл в списке), просто чистим буфер
+			vim.cmd('bdelete')
+		end
+	end
+end
+
+vim.keymap.set('n', 'qq', smart_close, { desc = 'Close buffer, keep layout' })
+
+vim.keymap.set('n', 'qq', smart_close, { desc = 'Close buffer but keep split alive' })
 -- save buffer and exit
 -- vim.keymap.set('i', '<C-s>', '<Esc>:w<CR>', { desc = 'save file and exit' })
 
