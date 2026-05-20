@@ -16,6 +16,11 @@
           },
           "procMacro": {
             "enable": true
+          },
+          "inlayHints": {
+            "parameterHints": { "enable": false }, // Отключает "inner:" и имена аргументов
+            "typeHints": { "enable": false }, // Отключает виртуальные типы вроде ": Vec<String>"
+            "chainingHints": { "enable": false } // Отключает подсказки в конце цепочек методов
           }
         }
       }
