@@ -19,6 +19,11 @@ vim.fn['plug#']('norcalli/nvim-colorizer.lua')
 vim.fn['plug#']('joshdick/onedark.vim')
 vim.fn['plug#']('MeanderingProgrammer/render-markdown.nvim')
 
+vim.fn['plug#']('leoluz/nvim-dap-go')
+
+
+vim.fn['plug#']('xiyaowong/transparent.nvim')
+
 -- debug
 vim.fn['plug#']('mfussenegger/nvim-dap')
 vim.fn['plug#']('mxsdev/nvim-dap-vscode-js')
@@ -58,7 +63,7 @@ require "theme"
 require "common"
 require "wbarbar"
 require "lua_line"
-require "treesitter"
+-- require "treesitter"
 require "coclsp"
 require "comment-config"
 require "keymaps"
@@ -71,4 +76,3 @@ require "colorize"
 require "uptimaze"
 require "masonn"
 require "dapp"
-

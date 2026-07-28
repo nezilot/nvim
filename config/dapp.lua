@@ -1,6 +1,22 @@
 local dap = require('dap')
 local dapui = require('dapui')
 
+require('dap-go').setup({
+  dap_configurations = {
+    {
+      type = "go",
+      name = "Debug (Build Flags)",
+      request = "launch",
+      program = "${workspaceFolder}", 
+      buildFlags = require("dap-go").get_build_flags,
+      stopOnEntry = true, -- <--- ЗАСТАВИТ ОТЛАДЧИК ЗАМЕРЕТЬ НА СТАРТЕ
+    },
+  },
+  delve = {
+    path = "/home/kitty/go/bin/dlv", -- Твой точный путь к dlv
+  },
+})
+
 -- === Адаптер для Node.js ===
 dap.adapters['pwa-node'] = {
 	type = 'server',
@@ -69,6 +85,7 @@ dap.configurations.typescript = {
 		protocol = "inspector",
 	}
 }
+
 
 
 -- === Настройка DAP UI ===
