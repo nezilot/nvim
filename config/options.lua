@@ -6,6 +6,7 @@ elseif vim.env.XDG_SESSION_TYPE and vim.env.XDG_SESSION_TYPE == 'wayland' then
     is_wayland = true
 end
 
+
 if vim.fn.has('win32') == 1 then
     -- Для Windows
     vim.g.clipboard = {

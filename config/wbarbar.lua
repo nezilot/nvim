@@ -14,7 +14,7 @@ require 'barbar'.setup {
 	no_name_title = nil,
 	sidebar_filetypes = {
 		undotree = { text = 'undotree' },
-		['neo-tree'] = { event = 'BufWipeout' },
+		['NvimTree'] = { event = 'BufWipeout', text = 'File Explorer' }, 
 		Outline = { event = 'BufWinLeave', text = 'symbols-outline' },
 	},
 	letters = 'asdfjkl;ghnmxcvbziowerutyqpASDFJKLGHNMXCVBZIOWERUTYQP',
